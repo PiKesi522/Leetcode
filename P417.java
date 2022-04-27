@@ -1,41 +1,44 @@
-class P417 {
+import java.util.*;
+public class P417 {
     static int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int W,H;
     int[][] heights;
-    int m, n;
-
     public List<List<Integer>> pacificAtlantic(int[][] heights) {
         this.heights = heights;
-        this.m = heights.length;
-        this.n = heights[0].length;
-        boolean[][] pacific = new boolean[m][n];
-        boolean[][] atlantic = new boolean[m][n];
-        for (int i = 0; i < m; i++) {
-            bfs(i, 0, pacific);
+        this.W = heights[0].length;
+        this.H = heights.length;
+
+        int i, j;
+        boolean[][] PacificAccess = new boolean[W][H];
+        boolean[][] AtlanticAccess = new boolean[W][H];
+        for (i = 0; i < W; i++) {
+            bfs(0, i, PacificAccess);
         }
-        for (int j = 1; j < n; j++) {
-            bfs(0, j, pacific);
+        for (i = 0; i < H; i++) {
+            bfs(i, 0, PacificAccess);
         }
-        for (int i = 0; i < m; i++) {
-            bfs(i, n - 1, atlantic);
+        for (i = 0; i < W; i++) {
+            bfs(H - 1, i, AtlanticAccess);
         }
-        for (int j = 0; j < n - 1; j++) {
-            bfs(m - 1, j, atlantic);
+        for (i = 0; i < H; i++) {
+            bfs(i, W - 1, AtlanticAccess);
         }
-        List<List<Integer>> result = new ArrayList<List<Integer>>();
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                if (pacific[i][j] && atlantic[i][j]) {
-                    List<Integer> cell = new ArrayList<Integer>();
-                    cell.add(i);
-                    cell.add(j);
-                    result.add(cell);
+
+        List<List<Integer>> ans = new ArrayList<>();
+        for (i = 0; i < H; i++) {
+            for (j = 0; j < W; j++) {
+                if (PacificAccess[i][j] && AtlanticAccess[i][j]) {
+                    List<Integer> BothAccess = new ArrayList<>();
+                    BothAccess.add(i);
+                    BothAccess.add(j);
+                    ans.add(BothAccess);
                 }
             }
         }
-        return result;
+        return ans;
     }
 
-    public void bfs(int row, int col, boolean[][] ocean) {
+    public void bfs(int row, int col, boolean[][] ocean){
         if (ocean[row][col]) {
             return;
         }
@@ -45,8 +48,11 @@ class P417 {
         while (!queue.isEmpty()) {
             int[] cell = queue.poll();
             for (int[] dir : dirs) {
-                int newRow = cell[0] + dir[0], newCol = cell[1] + dir[1];
-                if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && heights[newRow][newCol] >= heights[cell[0]][cell[1]] && !ocean[newRow][newCol]) {
+                int newRow = cell[0] + dir[0];
+                int newCol = cell[1] + dir[0];
+                if (newRow >= 0 && newRow < H && newCol >= 0 && newCol < W
+                        && heights[newRow][newCol] >= heights[cell[0]][cell[1]]
+                        && !ocean[newRow][newCol]) {
                     ocean[newRow][newCol] = true;
                     queue.offer(new int[]{newRow, newCol});
                 }
